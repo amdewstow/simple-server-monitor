@@ -27,7 +27,7 @@
         $hash        = $sv[ 2 ];
         $mkey        = md5( $sk . ":" . $sv[ 1 ] );
         $query       = "https://" . $sv[ 1 ] . ":2087/json-api/listaccts?api.version=2";
-        if ( 1 ) {
+        if ( $testing == false ) {
             $curl = curl_init();
             curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, 0 );
             curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, 0 );
@@ -69,6 +69,11 @@
             $list_u[ ] = '<br><button class="alert button"   id="' . $mkey . 'u_btnh" type="button" onclick="swap_sh(\'' . $mkey . '\',\'u\',0)">Hide users</button>';
             $users_str = '<div  style="display:none;"     id="' . $mkey . '_u">Users :' . implode( ",\n ", $list_u ) . "</div>";
             $ud_btns .= ' <button class="success button"  id="' . $mkey . 'u_btns" type="button" onclick="swap_sh(\'' . $mkey . '\',\'u\',1)">Show users</button>';
+        } else {
+             $domains_str = '';
+            $users_str   = '';
+            $ud_btns     = '';
+            
         }
         // echo " holds <pre>" . print_r( $domains, 1 ) . "</pre>";
         echo '<div class="row">
@@ -93,15 +98,20 @@
         echo '<div class="row"><div class="large-12 columns">' . $users_str . '</div></div>';
         echo '</div>' . "\n\n\n\n"; // ends per server
     }
-    echo "<script type=\"text/javascript\">
+    echo "<script type=\"text/javascript\">";
+    if ($testing) {
+        echo "var testing = true;";
+        } else {
+        echo "var testing = false;";    
+        }
 
-</script>";
+echo "</script>";
     //<script src='http://code.jquery.com/jquery-1.12.0.min.js'></script>
 ?>
 
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script src="js/main.min.js"></script>
+<script src="js/main.js"></script>
 <script type="text/javascript">
 google.charts.load('current', {
   'packages': ['gauge', 'corechart']

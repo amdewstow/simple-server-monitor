@@ -1,4 +1,5 @@
 <?
+    $testing                  = false;
     $servers                  = array( );
     $servers[ 'Server Name' ] = array(
         //array key is the human friendly name
