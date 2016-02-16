@@ -30,6 +30,8 @@
     $jsd[ ] = " datal['a181a603769c1f98ad927e7367c7aa51'] = new google.visualization.DataTable(); ";
     $jsd[ ] = " datal['a181a603769c1f98ad927e7367c7aa51'].addColumn('datetime', 'Day'); ";
     echo '</div>'; // ends gragphs
+    $all_domains = array( );
+    $doamin_warn = array( );
     foreach ( $servers as $sk => $sv ) {
         $all_s .= ",0";
         $whmusername = $sv[ 0 ];
@@ -47,29 +49,34 @@
             curl_setopt( $curl, CURLOPT_URL, $query );
             $result = curl_exec( $curl );
             if ( $result == false ) {
-                error_log( "curl_exec threw error \"" . curl_error( $curl ) . "\" for $query" );
-            }
-            curl_close( $curl );
-            $ar      = json_decode( $result, true );
-            $accs    = $ar[ 'data' ][ 'acct' ];
-            $domains = array( );
-            foreach ( $accs as $kk => $vv ) {
-                if ( $vv[ 'suspendtime' ] != 0 ) {
-                    //echo "<br>" . $vv[ 'domain' ] . ' ' . date( 'r', $vv[ 'suspendtime' ] );
-                } else {
-                    //echo "<pre>".print_r($vv,1)."</pre>";
-                    $domains[ $vv[ 'user' ] ] = $vv[ 'domain' ];
+                die( "curl_exec threw error \"" . curl_error( $curl ) . "\" for $query" );
+            } else {
+                curl_close( $curl );
+                $ar      = json_decode( $result, true );
+                $accs    = $ar[ 'data' ][ 'acct' ];
+                $domains = array( );
+                foreach ( $accs as $kk => $vv ) {
+                    if ( $vv[ 'suspendtime' ] != 0 ) {
+                        //echo "<br>" . $vv[ 'domain' ] . ' ' . date( 'r', $vv[ 'suspendtime' ] );
+                    } else {
+                        //echo "<pre>".print_r($vv,1)."</pre>";
+                        $domains[ $vv[ 'user' ] ] = $vv[ 'domain' ];
+                    }
                 }
-            }
-            ksort( $domains );
-            $list_d      = array( );
-            $list_u      = array( );
-            $domains_str = '';
-            $users_str   = '';
-            $ud_btns     = '';
-            foreach ( $domains as $cn => $dm ) {
-                $list_d[ ] = '<a href="http://' . $dm . '">' . $dm . '</a>';
-                $list_u[ ] = $cn;
+                ksort( $domains );
+                $list_d      = array( );
+                $list_u      = array( );
+                $domains_str = '';
+                $users_str   = '';
+                $ud_btns     = '';
+                foreach ( $domains as $cn => $dm ) {
+                    $list_d[ ] = '<a href="http://' . $dm . '">' . $dm . '</a>';
+                    $list_u[ ] = $cn;
+                    if ( isset( $all_domains[ $dm ] ) ) {
+                        $doamin_warn[ ] = $dm . " is on '" . $all_domains[ $dm ] . "' AND '" . $sk . "'";
+                    }
+                    $all_domains[ $dm ] = $sk;
+                }
             }
             //
             $list_d[ ]   = '<br><button class="alert button" id="' . $mkey . 'd_btnh" type="button" onclick="swap_sh(\'' . $mkey . '\',\'d\',0)">Hide Domains</button>';
@@ -110,6 +117,12 @@
     $all_s .= "]";
     $jsd[ ] = $all_s . ";";
     $jsd[ ] = "chartl['a181a603769c1f98ad927e7367c7aa51'].draw(datal['a181a603769c1f98ad927e7367c7aa51'], optionsl);";
+    if ( count( $doamin_warn ) > 0 ) {
+        echo '<div class="row">';
+        echo '<div class="large-2 columns" ><h2>Warning</h2></div>';
+        echo '<div class="large-10 columns" >' . implode( "\n<br>\n", $doamin_warn ) . '</div>';
+        echo '</div>';
+    }
     echo "<script type=\"text/javascript\">";
     if ( $testing ) {
         echo "var testing = true;";
