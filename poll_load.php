@@ -1,24 +1,22 @@
 <?
-    session_start();
     include 'vars.php';
     $out = array( );
     foreach ( $servers as $sk => $sv ) {
-        $whmusername = $sv[ 0 ];
-        $hash        = $sv[ 2 ];
         if ( $testing ) {
-            $ar                                 = array( );
-            $ar[ 'one' ]                        = ( mt_rand( 0, 1000 ) / 1000 );
-            $ar[ 'five' ]                       = ( $ar[ 'one' ] + ( mt_rand( 0, 1000 ) / 1000 ) ) / 2;
-            $ar[ 'fifteen' ]                    = ( $ar[ 'one' ] + $ar[ 'one' ] + ( mt_rand( 0, 1000 ) / 1000 ) ) / 3;
-            $out[ md5( $sk . ":" . $sv[ 1 ] ) ] = $ar;
+            $ar = array(
+                 'one' => rrz(),
+                'five' => ( rrz() + rrz() ) / 2,
+                'fifteen' => ( rrz() + rrz() + rrz() ) / 3 
+            );
         } else {
+            $whmusername = $sv[ 0 ];
+            $hash        = $sv[ 2 ];
             //get load avg
-            $query = "https://" . $sv[ 1 ] . ":2087/json-api/loadavg";
-            $curl  = curl_init();
+            $query       = "https://" . $sv[ 1 ] . ":2087/json-api/loadavg";
+            $curl        = curl_init();
             curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, 0 );
             curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, 0 );
             curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-            curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, 15 );
             $header[ 0 ] = "Authorization: WHM $whmusername:" . preg_replace( "'(\r|\n)'", "", $hash );
             curl_setopt( $curl, CURLOPT_HTTPHEADER, $header );
             curl_setopt( $curl, CURLOPT_URL, $query );
@@ -40,8 +38,11 @@
                     $ar[ 'fifteen' ] = 0;
                 }
             }
-            $out[ md5( $sk . ":" . $sv[ 1 ] ) ] = $ar;
         }
+        $out[ md5( $sk . ":" . $sv[ 1 ] ) ] = $ar;
     }
     echo json_encode( $out );
+    function rrz( ) {
+        return mt_rand( 1, 1000 ) / 100;
+    }
 ?>

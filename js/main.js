@@ -33,6 +33,7 @@ var optionsl = {
   vAxis: {
     minValue: 0
   },
+  pointSize: 5,
   chartArea: {
     width: "90%"
   },
@@ -76,12 +77,15 @@ function get_laodd() {
     url: "poll_load.php",
     success: function(resp) {
       var d = jQuery.parseJSON(resp);
+      var alld = [];
       $.each(d, function(i, v) {
         //console.log(i);
+        alld.push(v['one']);
         $("#" + i + "_h").html(v['one'] + "," + v['five'] + "," + v['fifteen']);
         redrawChart(i, v['one'], v['five'], v['fifteen']);
         redrawline(i, v['one'], v['five'], v['fifteen']);
       });
+      redrawallChart(alld);
       setTimeout(function() {
         get_laodd();
       }, 30000);
@@ -94,12 +98,11 @@ function drawChart(id, a, b, c) {
   b = parseFloat(b);
   c = parseFloat(c);
   dataa[id] = [
-      ['Label', 'Value'],
-      ['Load', a],
-      ['5 min', b],
-      ['15 min', c]
-    ]
-    //console.log("drawChart(" + id + "," + n + ")");  
+    ['Label', 'Value'],
+    ['Load', a],
+    ['5 min', b],
+    ['15 min', c]
+  ]
   dataa[id] = google.visualization.arrayToDataTable(dataa[id]);
   //console.log(id + "_g");
   chart[id] = new google.visualization.Gauge(document.getElementById(id + "_g"));
@@ -121,7 +124,6 @@ function drawline(id, a, b, c) {
   b = parseFloat(b);
   c = parseFloat(c);
   var ddd = new Date();
-  var ddz = new Date(ddd.getFullYear(), ddd.getMonth(), ddd.getDate(), ddd.getHours(), ddd.getMinutes(), ddd.getSeconds());
   //console.log(ddz);
   var poss = [ddd, a, b, c];
   datal[id].addRow(poss);
@@ -134,11 +136,23 @@ function redrawline(id, a, b, c) {
   b = parseFloat(b);
   c = parseFloat(c);
   var ddd = new Date();
-  var ddz = new Date(ddd.getFullYear(), ddd.getMonth(), ddd.getDate(), ddd.getHours(), ddd.getMinutes(), ddd.getSeconds());
   var poss = [ddd, a, b, c];
   datal[id].addRow(poss);
   if (datal[id].getNumberOfRows() > 10) {
     datal[id].removeRow(0);
   }
+  chartl[id].draw(datal[id], optionsl);
+}
+
+function redrawallChart(ar) {
+  var id = "a181a603769c1f98ad927e7367c7aa51";
+  var ddd = new Date();
+  //console.log(ddz);
+  var poss = [ddd];
+  $.each(ar, function(i, v) {
+    a = parseFloat(v);
+    poss.push(a);
+  });
+  datal[id].addRow(poss);
   chartl[id].draw(datal[id], optionsl);
 }

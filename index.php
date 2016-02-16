@@ -22,9 +22,19 @@
     $jsd    = array( );
     $jsd[ ] = "var ddd = new Date();";
     $jsd[ ] = "var ddz = new Date(ddd.getFullYear(), ddd.getMonth(), ddd.getDate(), ddd.getHours(), ddd.getMinutes(), 0,0);";
+    $mkeya  = md5( 'all' );
+    echo '<div class="row">';
+    echo "\n" . '<div class="large-12 columns" id="' . $mkeya . '_l" style="width: 1000px; height: 150px;">"' . $mkeya . '_l"</div>';
+    $jsd[ ] = "chartl['a181a603769c1f98ad927e7367c7aa51'] = new google.visualization.LineChart(document.getElementById('a181a603769c1f98ad927e7367c7aa51_l'));  ";
+    $all_s  = " dataa['a181a603769c1f98ad927e7367c7aa51'] = [ddz";
+    $jsd[ ] = " datal['a181a603769c1f98ad927e7367c7aa51'] = new google.visualization.DataTable(); ";
+    $jsd[ ] = " datal['a181a603769c1f98ad927e7367c7aa51'].addColumn('datetime', 'Day'); ";
+    echo '</div>'; // ends gragphs
     foreach ( $servers as $sk => $sv ) {
+        $all_s .= ",0";
         $whmusername = $sv[ 0 ];
         $hash        = $sv[ 2 ];
+        $jsd[ ]      = " datal['" . $mkeya . "'].addColumn('number', '" . $sk . "');";
         $mkey        = md5( $sk . ":" . $sv[ 1 ] );
         $query       = "https://" . $sv[ 1 ] . ":2087/json-api/listaccts?api.version=2";
         if ( $testing == false ) {
@@ -70,10 +80,9 @@
             $users_str = '<div  style="display:none;"     id="' . $mkey . '_u">Users :' . implode( ",\n ", $list_u ) . "</div>";
             $ud_btns .= ' <button class="success button"  id="' . $mkey . 'u_btns" type="button" onclick="swap_sh(\'' . $mkey . '\',\'u\',1)">Show users</button>';
         } else {
-             $domains_str = '';
+            $domains_str = '';
             $users_str   = '';
             $ud_btns     = '';
-            
         }
         // echo " holds <pre>" . print_r( $domains, 1 ) . "</pre>";
         echo '<div class="row">
@@ -98,18 +107,18 @@
         echo '<div class="row"><div class="large-12 columns">' . $users_str . '</div></div>';
         echo '</div>' . "\n\n\n\n"; // ends per server
     }
+    $all_s .= "]";
+    $jsd[ ] = $all_s . ";";
+    $jsd[ ] = "chartl['a181a603769c1f98ad927e7367c7aa51'].draw(datal['a181a603769c1f98ad927e7367c7aa51'], optionsl);";
     echo "<script type=\"text/javascript\">";
-    if ($testing) {
+    if ( $testing ) {
         echo "var testing = true;";
-        } else {
-        echo "var testing = false;";    
-        }
-
-echo "</script>";
+    } else {
+        echo "var testing = false;";
+    }
+    echo "</script>";
     //<script src='http://code.jquery.com/jquery-1.12.0.min.js'></script>
 ?>
-
-
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="js/main.js"></script>
 <script type="text/javascript">
@@ -124,10 +133,7 @@ function startChart() {
 ?>
   get_laod();
 }
-
-
 </script>
-
 <script src="js/vendor/jquery.min.js"></script>
     <script src="js/vendor/what-input.min.js"></script>
     <script src="js/foundation.min.js"></script>
