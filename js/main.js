@@ -154,5 +154,8 @@ function redrawallChart(ar) {
     poss.push(a);
   });
   datal[id].addRow(poss);
+  if (datal[id].getNumberOfRows() > 10) {
+    datal[id].removeRow(0);
+  }
   chartl[id].draw(datal[id], optionsl);
 }
