@@ -31,7 +31,8 @@ var optionsl = {
     textPosition: 'in'
   },
   vAxis: {
-    minValue: 0
+    minValue: 0,
+    maxValue: 1
   },
   pointSize: 5,
   chartArea: {

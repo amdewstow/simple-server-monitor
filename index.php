@@ -19,10 +19,11 @@
         die( 'Copy "vars.example.php" to "vars.php" and enter the right info' );
     }
     require 'vars.php';
-    $jsd    = array( );
-    $jsd[ ] = "var ddd = new Date();";
-    $jsd[ ] = "var ddz = new Date(ddd.getFullYear(), ddd.getMonth(), ddd.getDate(), ddd.getHours(), ddd.getMinutes(), 0,0);";
-    $mkeya  = md5( 'all' );
+    $jsd       = array( );
+    $jsd[ ]    = "var ddd = new Date();";
+    $jsd[ ]    = "var ddz = new Date(ddd.getFullYear(), ddd.getMonth(), ddd.getDate(), ddd.getHours(), ddd.getMinutes(), 0,0);";
+    $mkeya     = md5( 'all' );
+    $big_table = array( );
     echo '<div class="row">';
     echo "\n" . '<div class="large-12 columns" id="' . $mkeya . '_l" style="width: 1000px; height: 150px;">"' . $mkeya . '_l"</div>';
     $jsd[ ] = "chartl['a181a603769c1f98ad927e7367c7aa51'] = new google.visualization.LineChart(document.getElementById('a181a603769c1f98ad927e7367c7aa51_l'));  ";
@@ -61,6 +62,12 @@
                     } else {
                         //echo "<pre>".print_r($vv,1)."</pre>";
                         $domains[ $vv[ 'user' ] ] = $vv[ 'domain' ];
+                        $big_table[ ]             = array(
+                             $sk,
+                            $vv[ 'ip' ],
+                            $vv[ 'user' ],
+                            $vv[ 'domain' ] 
+                        );
                     }
                 }
                 ksort( $domains );
@@ -130,13 +137,13 @@
         echo "var testing = false;";
     }
     echo "</script>";
-    //<script src='http://code.jquery.com/jquery-1.12.0.min.js'></script>
 ?>
+<div id="big_tab">big_tab</div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="js/main.js"></script>
 <script type="text/javascript">
 google.charts.load('current', {
-  'packages': ['gauge', 'corechart']
+  'packages': ['gauge', 'corechart','table']
 });
 google.charts.setOnLoadCallback(startChart);
 
@@ -145,6 +152,24 @@ function startChart() {
     echo "\n" . implode( "\n", $jsd );
 ?>
   get_laod();
+  go_big_tab();
+}
+function go_big_tab() {
+  var big_tab = new google.visualization.DataTable();
+  // Declare columns
+  big_tab.addColumn('string', 'Server');
+  big_tab.addColumn('string', 'IP');
+  big_tab.addColumn('string', 'Username');
+  big_tab.addColumn('string', 'Domain');
+<?php
+    echo "\n big_tab.addRows(" . json_encode( $big_table, true ) . ");\n";
+?>
+  var table = new google.visualization.Table(document.getElementById('big_tab'));
+  table.draw(big_tab, {
+    showRowNumber: true,
+    width: '100%',
+    height: '100%'
+  });
 }
 </script>
 <script src="js/vendor/jquery.min.js"></script>
